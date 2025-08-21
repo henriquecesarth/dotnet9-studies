@@ -1,0 +1,57 @@
+# Compilados / binários
+bin/
+obj/
+out/
+[Bb]uild/
+[Ll]og/
+
+# Publicação
+publish/
+*.pubxml
+*.publishproj
+
+# Configuração de usuário
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+.config/
+
+
+# Cache do VS e Rider
+.vs/
+.idea/
+*.iml
+.vscode/
+
+# Cache do NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+packages/
+.nuget/
+
+# Arquivos do Rider / Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Logs
+*.log
+
+# Arquivos temporários do sistema
+[Tt]humbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Configurações locais sensíveis
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Outros temporários
+*.tmp
+*.bak
+*.swp
