@@ -18,11 +18,11 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Product>> Get()
+        public async Task<ActionResult<IEnumerable<Product>>> GetAsync()
         {
             try
             {
-                var products = _context.Products.AsNoTracking().ToList();
+                var products = await _context.Products.AsNoTracking().ToListAsync();
 
                 if (products == null)
                     return NotFound("Any product was found...");
@@ -39,13 +39,13 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetProduct")]
-        public ActionResult<Product> Get(int id)
+        public async Task<ActionResult<Product>> GetAsync(int id)
         {
             try
             {
-                var product = _context
+                var product = await _context
                     .Products.AsNoTracking()
-                    .FirstOrDefault(x => x.ProductId == id);
+                    .FirstOrDefaultAsync(x => x.ProductId == id);
 
                 if (product == null)
                     return NotFound($"Product with id={id} not found...");
@@ -62,15 +62,15 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Product> Post(Product product)
+        public async Task<ActionResult<Product>> PostAsync(Product product)
         {
             try
             {
                 if (product == null)
                     return BadRequest("The product is invalid...");
 
-                _context.Products.Add(product);
-                _context.SaveChanges();
+                await _context.Products.AddAsync(product);
+                await _context.SaveChangesAsync();
                 return new CreatedAtRouteResult(
                     "GetProduct",
                     new { id = product.ProductId },
@@ -87,7 +87,7 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<Product> Put(int id, Product product)
+        public async Task<ActionResult<Product>> PutAsync(int id, Product product)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace CatalogAPI.Controllers
                     return BadRequest($"Id={id} does not match ProductId={product.ProductId}...");
 
                 _context.Products.Update(product);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(product);
             }
@@ -109,17 +109,17 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult<Product> Delete(int id)
+        public async Task<ActionResult<Product>> DeleteAsync(int id)
         {
             try
             {
-                var product = _context.Products.FirstOrDefault(x => x.ProductId == id);
+                var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductId == id);
 
                 if (product == null)
                     return NotFound($"Product with id={id} not found...");
 
                 _context.Products.Remove(product);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(product);
             }

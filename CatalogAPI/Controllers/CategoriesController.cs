@@ -18,11 +18,11 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Category>> Get()
+        public async Task<ActionResult<IEnumerable<Category>>> GetAsync()
         {
             try
             {
-                var categories = _context.Categories.AsNoTracking().ToList();
+                var categories = await _context.Categories.AsNoTracking().ToListAsync();
 
                 if (categories == null)
                     return NotFound("Any category was found...");
@@ -39,13 +39,13 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCategory")]
-        public ActionResult<Category> Get(int id)
+        public async Task<ActionResult<Category>> GetAsync(int id)
         {
             try
             {
-                var category = _context
+                var category = await _context
                     .Categories.AsNoTracking()
-                    .FirstOrDefault(x => x.CategoryId == id);
+                    .FirstOrDefaultAsync(x => x.CategoryId == id);
 
                 if (category == null)
                     return NotFound($"Category with id={id} not found...");
@@ -62,14 +62,14 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpGet("Products")]
-        public ActionResult<IEnumerable<Category>> GetCategoriesProducts()
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategoriesProductsAsync()
         {
             try
             {
-                var categories = _context
+                var categories = await _context
                     .Categories.AsNoTracking()
                     .Include(x => x.Products)
-                    .ToList();
+                    .ToListAsync();
 
                 if (categories == null)
                     return NotFound("Any category was found...");
@@ -86,15 +86,15 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Category> Post(Category category)
+        public async Task<ActionResult> PostAsync(Category category)
         {
             try
             {
                 if (category == null)
                     return BadRequest("The category is invalid...");
 
-                _context.Categories.Add(category);
-                _context.SaveChanges();
+                await _context.Categories.AddAsync(category);
+                await _context.SaveChangesAsync();
                 return new CreatedAtRouteResult(
                     "GetCategory",
                     new { id = category.CategoryId },
@@ -111,7 +111,7 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Category category)
+        public async Task<ActionResult> PutAsync(int id, Category category)
         {
             try
             {
@@ -121,7 +121,7 @@ namespace CatalogAPI.Controllers
                     );
 
                 _context.Categories.Update(category);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok(category);
             }
             catch (Exception)
@@ -134,17 +134,17 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult<Category> Delete(int id)
+        public async Task<ActionResult<Category>> DeleteAsync(int id)
         {
             try
             {
-                var category = _context.Categories.FirstOrDefault(x => x.CategoryId == id);
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.CategoryId == id);
 
                 if (category == null)
                     return NotFound($"Category with id={id} not found...");
 
                 _context.Categories.Remove(category);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok(category);
             }
             catch (Exception)
