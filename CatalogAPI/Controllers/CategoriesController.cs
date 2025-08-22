@@ -11,16 +11,20 @@ namespace CatalogAPI.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger _logger;
 
-        public CategoriesController(AppDbContext context)
+        public CategoriesController(AppDbContext context, ILogger<CategoriesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IEnumerable<Category>>> GetAsync()
         {
+            _logger.LogInformation($"######### GET Categories/ #########");
+
             try
             {
                 var categories = await _context.Categories.AsNoTracking().ToListAsync();
@@ -42,6 +46,7 @@ namespace CatalogAPI.Controllers
         [HttpGet("{id:int}", Name = "GetCategory")]
         public async Task<ActionResult<Category>> GetAsync(int id)
         {
+            _logger.LogInformation($"######### GET Categories/{id} #########");
             try
             {
                 var category = await _context
@@ -65,6 +70,8 @@ namespace CatalogAPI.Controllers
         [HttpGet("Products")]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategoriesProductsAsync()
         {
+            _logger.LogInformation("######### GET Categories/Products #########");
+
             try
             {
                 var categories = await _context
