@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using CatalogAPI.Context;
 using CatalogAPI.Extensions;
 using CatalogAPI.Filters;
+using CatalogAPI.Logging;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -26,6 +27,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<ApiLoggingFilter>();
+
+builder.Logging.AddProvider(
+    new CustomLoggerProvider(
+        new CustomLoggerProviderConfiguration { LogLevel = LogLevel.Information }
+    )
+);
 
 var app = builder.Build();
 

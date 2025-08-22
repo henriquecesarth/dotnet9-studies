@@ -40,6 +40,7 @@ _ReSharper*/
 
 # Logs
 *.log
+Logs/
 
 # Arquivos temporários do sistema
 [Tt]humbs.db
