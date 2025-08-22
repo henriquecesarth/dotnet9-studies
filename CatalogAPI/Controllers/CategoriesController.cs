@@ -25,46 +25,27 @@ namespace CatalogAPI.Controllers
         {
             _logger.LogInformation($"######### GET Categories/ #########");
 
-            try
-            {
-                var categories = await _context.Categories.AsNoTracking().ToListAsync();
+            var categories = await _context.Categories.AsNoTracking().ToListAsync();
 
-                if (categories == null)
-                    return NotFound("Any category was found...");
+            if (categories == null)
+                return NotFound("Any category was found...");
 
-                return categories;
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    "An error ocurred while processing your request."
-                );
-            }
+            return categories;
         }
 
         [HttpGet("{id:int}", Name = "GetCategory")]
         public async Task<ActionResult<Category>> GetAsync(int id)
         {
             _logger.LogInformation($"######### GET Categories/{id} #########");
-            try
-            {
-                var category = await _context
-                    .Categories.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.CategoryId == id);
 
-                if (category == null)
-                    return NotFound($"Category with id={id} not found...");
+            var category = await _context
+                .Categories.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CategoryId == id);
 
-                return category;
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    "An error ocurred while processing your request."
-                );
-            }
+            if (category == null)
+                return NotFound($"Category with id={id} not found...");
+
+            return category;
         }
 
         [HttpGet("Products")]
@@ -72,98 +53,55 @@ namespace CatalogAPI.Controllers
         {
             _logger.LogInformation("######### GET Categories/Products #########");
 
-            try
-            {
-                var categories = await _context
-                    .Categories.AsNoTracking()
-                    .Include(x => x.Products)
-                    .ToListAsync();
+            var categories = await _context
+                .Categories.AsNoTracking()
+                .Include(x => x.Products)
+                .ToListAsync();
 
-                if (categories == null)
-                    return NotFound("Any category was found...");
+            if (categories == null)
+                return NotFound("Any category was found...");
 
-                return categories;
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    "An error ocurred while processing your request."
-                );
-            }
+            return categories;
         }
 
         [HttpPost]
         public async Task<ActionResult> PostAsync(Category category)
         {
-            try
-            {
-                if (category == null)
-                    return BadRequest("The category is invalid...");
+            if (category == null)
+                return BadRequest("The category is invalid...");
 
-                await _context.Categories.AddAsync(category);
-                await _context.SaveChangesAsync();
-                return new CreatedAtRouteResult(
-                    "GetCategory",
-                    new { id = category.CategoryId },
-                    category
-                );
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    "An error ocurred while processing your request."
-                );
-            }
+            await _context.Categories.AddAsync(category);
+            await _context.SaveChangesAsync();
+            return new CreatedAtRouteResult(
+                "GetCategory",
+                new { id = category.CategoryId },
+                category
+            );
         }
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult> PutAsync(int id, Category category)
         {
-            try
-            {
-                if (id != category.CategoryId)
-                    return BadRequest(
-                        $"Id={id} does not match CategoryId={category.CategoryId}..."
-                    );
+            if (id != category.CategoryId)
+                return BadRequest($"Id={id} does not match CategoryId={category.CategoryId}...");
 
-                _context.Categories.Update(category);
-                await _context.SaveChangesAsync();
-                return Ok(category);
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    "An error ocurred while processing your request."
-                );
-            }
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
+            return Ok(category);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult<Category>> DeleteAsync(int id)
         {
-            try
-            {
-                var category = await _context.Categories.FirstOrDefaultAsync(x =>
-                    x.CategoryId == id
-                );
+            var category = await _context.Categories.FirstOrDefaultAsync(x => x.CategoryId == id);
 
-                if (category == null)
-                    return NotFound($"Category with id={id} not found...");
+            if (category == null)
+                return NotFound($"Category with id={id} not found...");
 
-                _context.Categories.Remove(category);
-                await _context.SaveChangesAsync();
-                return Ok(category);
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    "An error ocurred while processing your request."
-                );
-            }
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+
+            return Ok(category);
         }
     }
 }

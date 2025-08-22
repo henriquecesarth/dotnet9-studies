@@ -4,8 +4,8 @@ namespace CatalogAPI.Logging;
 
 public class CustomLogger : ILogger
 {
-    readonly string _loggerName;
-    readonly CustomLoggerProviderConfiguration _loggerConfig;
+    private readonly string _loggerName;
+    private readonly CustomLoggerProviderConfiguration _loggerConfig;
 
     public CustomLogger(string loggerName, CustomLoggerProviderConfiguration loggerConfig)
     {
