@@ -1,6 +1,5 @@
 using CatalogAPI.Context;
 using CatalogAPI.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -138,7 +137,9 @@ namespace CatalogAPI.Controllers
         {
             try
             {
-                var category = await _context.Categories.FirstOrDefaultAsync(x => x.CategoryId == id);
+                var category = await _context.Categories.FirstOrDefaultAsync(x =>
+                    x.CategoryId == id
+                );
 
                 if (category == null)
                     return NotFound($"Category with id={id} not found...");

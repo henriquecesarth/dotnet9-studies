@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using CatalogAPI.Context;
+using CatalogAPI.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -30,6 +31,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();

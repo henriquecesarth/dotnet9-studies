@@ -15,12 +15,16 @@ public class Category
     [Key]
     public int CategoryId { get; set; }
 
-    [Required]
-    [StringLength(80)]
+    [Required(ErrorMessage = "The name is required")]
+    [StringLength(
+        80,
+        MinimumLength = 5,
+        ErrorMessage = "The name must be between {2} and {1} characters long"
+    )]
     public string? Name { get; set; }
 
-    [Required]
-    [StringLength(300)]
+    [Required(ErrorMessage = "The image url is required")]
+    [StringLength(300, ErrorMessage = "The image url must be at maximum {1} characters long")]
     public string? ImgUrl { get; set; }
 
     public ICollection<Product>? Products { get; set; }
