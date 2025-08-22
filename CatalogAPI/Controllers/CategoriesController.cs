@@ -1,4 +1,5 @@
 using CatalogAPI.Context;
+using CatalogAPI.Filters;
 using CatalogAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IEnumerable<Category>>> GetAsync()
         {
             try
