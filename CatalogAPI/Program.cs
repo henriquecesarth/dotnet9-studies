@@ -3,6 +3,7 @@ using CatalogAPI.Context;
 using CatalogAPI.Extensions;
 using CatalogAPI.Filters;
 using CatalogAPI.Logging;
+using CatalogAPI.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -27,6 +28,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<ApiLoggingFilter>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Logging.AddProvider(
     new CustomLoggerProvider(

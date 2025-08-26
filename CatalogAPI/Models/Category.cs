@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace CatalogAPI.Models;
 
@@ -27,5 +28,6 @@ public class Category
     [StringLength(300, ErrorMessage = "The image url must be at maximum {1} characters long")]
     public string? ImgUrl { get; set; }
 
+    [JsonIgnore]
     public ICollection<Product>? Products { get; set; }
 }

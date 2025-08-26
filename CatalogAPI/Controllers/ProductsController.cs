@@ -1,6 +1,5 @@
-using CatalogAPI.Context;
 using CatalogAPI.Models;
-using Microsoft.AspNetCore.Http;
+using CatalogAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,30 +9,28 @@ namespace CatalogAPI.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IProductRepository _productRepository;
 
-        public ProductsController(AppDbContext context)
+        public ProductsController(IProductRepository productRepository)
         {
-            _context = context;
+            _productRepository = productRepository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetAsync()
+        public ActionResult<IEnumerable<Product>> Get()
         {
-            var products = await _context.Products.AsNoTracking().ToListAsync();
+            var products = _productRepository.GetAll();
 
             if (products == null)
                 return NotFound("Any product was found...");
 
-            return products;
+            return Ok(products);
         }
 
         [HttpGet("{id:int}", Name = "GetProduct")]
-        public async Task<ActionResult<Product>> GetAsync(int id)
+        public ActionResult<Product> Get(int id)
         {
-            var product = await _context
-                .Products.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.ProductId == id);
+            var product = _productRepository.Get(p => p.ProductId == id);
 
             if (product == null)
                 return NotFound($"Product with id={id} not found...");
@@ -41,42 +38,46 @@ namespace CatalogAPI.Controllers
             return product;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Product>> PostAsync(Product product)
+        [HttpGet("Categories/{categoryId:int}")]
+        public ActionResult<IEnumerable<Product>> GetProductsByCategory(int categoryId)
         {
-            if (product == null)
-                return BadRequest("The product is invalid...");
+            var products = _productRepository.GetProductsByCategory(categoryId);
 
-            await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
+            if (products == null || !products.Any())
+                return NotFound($"Any product was found for category with id={categoryId}...");
 
-            return new CreatedAtRouteResult("GetProduct", new { id = product.ProductId }, product);
+            return Ok(products);
+        }
+
+        [HttpPost]
+        public ActionResult<Product> Post(Product product)
+        {
+            var createdProduct = _productRepository.Create(product);
+
+            return new CreatedAtRouteResult(
+                "GetProduct",
+                new { id = createdProduct.ProductId },
+                createdProduct
+            );
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<Product>> PutAsync(int id, Product product)
+        public ActionResult<Product> Put(int id, Product product)
         {
             if (id != product.ProductId)
                 return BadRequest($"Id={id} does not match ProductId={product.ProductId}...");
 
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
+            var updatedProduct = _productRepository.Update(product);
 
-            return Ok(product);
+            return updatedProduct;
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult<Product>> DeleteAsync(int id)
+        public ActionResult<Product> Delete(int id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductId == id);
+            var deletedProduct = _productRepository.Delete(id);
 
-            if (product == null)
-                return NotFound($"Product with id={id} not found...");
-
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
-            return Ok(product);
+            return deletedProduct;
         }
     }
 }
