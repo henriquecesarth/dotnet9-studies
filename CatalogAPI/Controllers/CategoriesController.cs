@@ -1,3 +1,5 @@
+using CatalogAPI.DTOs;
+using CatalogAPI.DTOs.Mappings;
 using CatalogAPI.Filters;
 using CatalogAPI.Models;
 using CatalogAPI.Repositories;
@@ -20,7 +22,7 @@ namespace CatalogAPI.Controllers
 
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public ActionResult<IEnumerable<Category>> Get()
+        public ActionResult<IEnumerable<CategoryDTO>> Get()
         {
             _logger.LogInformation($"######### GET Categories/ #########");
 
@@ -32,11 +34,13 @@ namespace CatalogAPI.Controllers
                 return NotFound("Any category was found...");
             }
 
-            return Ok(categories);
+            var categoriesDTO = categories.MapToCategoryDTOList();
+
+            return Ok(categoriesDTO);
         }
 
         [HttpGet("{id:int}", Name = "GetCategory")]
-        public ActionResult<Category> Get(int id)
+        public ActionResult<CategoryDTO> Get(int id)
         {
             _logger.LogInformation($"######### GET Categories/{id} #########");
 
@@ -48,11 +52,13 @@ namespace CatalogAPI.Controllers
                 return NotFound($"Category with id={id} not found...");
             }
 
-            return category;
+            var categoryDTO = category.MapToCategoryDTO();
+
+            return categoryDTO;
         }
 
         [HttpGet("Products")]
-        public ActionResult<IEnumerable<Category>> GetCategoriesProducts()
+        public ActionResult<IEnumerable<CategoryDTO>> GetCategoriesProducts()
         {
             _logger.LogInformation("######### GET Categories/Products #########");
 
@@ -61,54 +67,66 @@ namespace CatalogAPI.Controllers
             if (categories == null)
                 return NotFound("Any category was found...");
 
-            return Ok(categories);
+            var categoriesDTO = categories.MapToCategoryDTOList();
+
+            return Ok(categoriesDTO);
         }
 
         [HttpPost]
-        public ActionResult Post(Category category)
+        public ActionResult<CategoryDTO> Post(CategoryDTO categoryDTO)
         {
             _logger.LogInformation("######### POST Categories #########");
 
-            if (category == null)
+            if (categoryDTO == null)
             {
                 _logger.LogWarning("The category is invalid...");
                 return BadRequest("The category is invalid...");
             }
 
+            var category = categoryDTO.MapToCategory();
+
             var createdCategory = _uof.CategoryRepository.Create(category);
             _uof.Commit();
 
+            var createdCategoryDTO = createdCategory.MapToCategoryDTO();
+
             return new CreatedAtRouteResult(
                 "GetCategory",
-                new { id = createdCategory.CategoryId },
-                category
+                new { id = createdCategoryDTO.CategoryId },
+                createdCategoryDTO
             );
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<Category> Put(int id, Category category)
+        public ActionResult<CategoryDTO> Put(int id, CategoryDTO categoryDTO)
         {
             _logger.LogInformation("######### PUT Categories #########");
 
-            if (category.CategoryId != id)
+            if (categoryDTO.CategoryId != id)
             {
                 _logger.LogWarning("The categories id does not match...");
                 return BadRequest("The categories id does not match...");
             }
 
+            var category = categoryDTO.MapToCategory();
+
             var updatedCategory = _uof.CategoryRepository.Update(category);
             _uof.Commit();
 
-            return updatedCategory;
+            var updatedCategoryDTO = updatedCategory.MapToCategoryDTO();
+
+            return updatedCategoryDTO;
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult<Category> Delete(int id)
+        public ActionResult<CategoryDTO> Delete(int id)
         {
             var deletedCategory = _uof.CategoryRepository.Delete(id);
             _uof.Commit();
 
-            return deletedCategory;
+            var deletedCategoryDTO = deletedCategory.MapToCategoryDTO();
+
+            return deletedCategoryDTO;
         }
     }
 }
