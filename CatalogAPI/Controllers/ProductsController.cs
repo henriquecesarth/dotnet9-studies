@@ -9,17 +9,17 @@ namespace CatalogAPI.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductRepository _productRepository;
+        private readonly IUnitOfWork _uof;
 
-        public ProductsController(IProductRepository productRepository)
+        public ProductsController(IUnitOfWork uof)
         {
-            _productRepository = productRepository;
+            _uof = uof;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Product>> Get()
         {
-            var products = _productRepository.GetAll();
+            var products = _uof.ProductRepository.GetAll();
 
             if (products == null)
                 return NotFound("Any product was found...");
@@ -30,7 +30,7 @@ namespace CatalogAPI.Controllers
         [HttpGet("{id:int}", Name = "GetProduct")]
         public ActionResult<Product> Get(int id)
         {
-            var product = _productRepository.Get(p => p.ProductId == id);
+            var product = _uof.ProductRepository.Get(p => p.ProductId == id);
 
             if (product == null)
                 return NotFound($"Product with id={id} not found...");
@@ -41,7 +41,7 @@ namespace CatalogAPI.Controllers
         [HttpGet("Categories/{categoryId:int}")]
         public ActionResult<IEnumerable<Product>> GetProductsByCategory(int categoryId)
         {
-            var products = _productRepository.GetProductsByCategory(categoryId);
+            var products = _uof.ProductRepository.GetProductsByCategory(categoryId);
 
             if (products == null || !products.Any())
                 return NotFound($"Any product was found for category with id={categoryId}...");
@@ -52,7 +52,8 @@ namespace CatalogAPI.Controllers
         [HttpPost]
         public ActionResult<Product> Post(Product product)
         {
-            var createdProduct = _productRepository.Create(product);
+            var createdProduct = _uof.ProductRepository.Create(product);
+            _uof.Commit();
 
             return new CreatedAtRouteResult(
                 "GetProduct",
@@ -67,7 +68,8 @@ namespace CatalogAPI.Controllers
             if (id != product.ProductId)
                 return BadRequest($"Id={id} does not match ProductId={product.ProductId}...");
 
-            var updatedProduct = _productRepository.Update(product);
+            var updatedProduct = _uof.ProductRepository.Update(product);
+            _uof.Commit();
 
             return updatedProduct;
         }
@@ -75,7 +77,8 @@ namespace CatalogAPI.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult<Product> Delete(int id)
         {
-            var deletedProduct = _productRepository.Delete(id);
+            var deletedProduct = _uof.ProductRepository.Delete(id);
+            _uof.Commit();
 
             return deletedProduct;
         }

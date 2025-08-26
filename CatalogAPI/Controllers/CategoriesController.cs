@@ -9,16 +9,13 @@ namespace CatalogAPI.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IUnitOfWork _uof;
         private readonly ILogger _logger;
 
-        public CategoriesController(
-            ILogger<CategoriesController> logger,
-            ICategoryRepository categoryRepository
-        )
+        public CategoriesController(ILogger<CategoriesController> logger, IUnitOfWork uof)
         {
             _logger = logger;
-            _categoryRepository = categoryRepository;
+            _uof = uof;
         }
 
         [HttpGet]
@@ -27,7 +24,7 @@ namespace CatalogAPI.Controllers
         {
             _logger.LogInformation($"######### GET Categories/ #########");
 
-            var categories = _categoryRepository.GetAll();
+            var categories = _uof.CategoryRepository.GetAll();
 
             if (categories == null)
             {
@@ -43,7 +40,7 @@ namespace CatalogAPI.Controllers
         {
             _logger.LogInformation($"######### GET Categories/{id} #########");
 
-            var category = _categoryRepository.Get(c => c.CategoryId == id);
+            var category = _uof.CategoryRepository.Get(c => c.CategoryId == id);
 
             if (category == null)
             {
@@ -59,7 +56,7 @@ namespace CatalogAPI.Controllers
         {
             _logger.LogInformation("######### GET Categories/Products #########");
 
-            var categories = _categoryRepository.GetCategoriesProducts();
+            var categories = _uof.CategoryRepository.GetCategoriesProducts();
 
             if (categories == null)
                 return NotFound("Any category was found...");
@@ -78,7 +75,8 @@ namespace CatalogAPI.Controllers
                 return BadRequest("The category is invalid...");
             }
 
-            var createdCategory = _categoryRepository.Create(category);
+            var createdCategory = _uof.CategoryRepository.Create(category);
+            _uof.Commit();
 
             return new CreatedAtRouteResult(
                 "GetCategory",
@@ -98,14 +96,17 @@ namespace CatalogAPI.Controllers
                 return BadRequest("The categories id does not match...");
             }
 
-            var updatedCategory = _categoryRepository.Update(category);
+            var updatedCategory = _uof.CategoryRepository.Update(category);
+            _uof.Commit();
+
             return updatedCategory;
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult<Category> Delete(int id)
         {
-            var deletedCategory = _categoryRepository.Delete(id);
+            var deletedCategory = _uof.CategoryRepository.Delete(id);
+            _uof.Commit();
 
             return deletedCategory;
         }

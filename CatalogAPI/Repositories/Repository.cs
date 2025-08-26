@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using CatalogAPI.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace CatalogAPI.Repositories;
 
@@ -19,7 +20,6 @@ public class Repository<T> : IRepository<T>
             throw new ArgumentNullException(nameof(entity));
 
         _context.Set<T>().Add(entity);
-        _context.SaveChanges();
 
         return entity;
     }
@@ -32,14 +32,13 @@ public class Repository<T> : IRepository<T>
             throw new ArgumentNullException(nameof(entity));
 
         _context.Set<T>().Remove(entity);
-        _context.SaveChanges();
 
         return entity;
     }
 
     public IEnumerable<T> GetAll()
     {
-        return _context.Set<T>().ToList();
+        return _context.Set<T>().AsNoTracking().ToList();
     }
 
     public T? Get(Expression<Func<T, bool>> predicate)
@@ -53,7 +52,6 @@ public class Repository<T> : IRepository<T>
             throw new ArgumentNullException(nameof(entity));
 
         _context.Set<T>().Update(entity);
-        _context.SaveChanges();
 
         return entity;
     }
