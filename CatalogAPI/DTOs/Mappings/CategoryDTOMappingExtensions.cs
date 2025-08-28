@@ -12,6 +12,7 @@ public static class CategoryDTOMappingExtensions
             CategoryId = category.CategoryId,
             Name = category.Name,
             ImgUrl = category.ImgUrl,
+            Products = category.Products,
         };
     }
 
@@ -25,7 +26,9 @@ public static class CategoryDTOMappingExtensions
         };
     }
 
-    public static IEnumerable<CategoryDTO> MapToCategoryDTOList(this IEnumerable<Category> categories)
+    public static IEnumerable<CategoryDTO> MapToCategoryDTOList(
+        this IEnumerable<Category> categories
+    )
     {
         return categories.Select(x => x.MapToCategoryDTO());
     }

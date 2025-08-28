@@ -22,6 +22,6 @@ public class CategoryDTO
     [StringLength(300, ErrorMessage = "The image url must be at maximum {1} characters long")]
     public string? ImgUrl { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public ICollection<Product>? Products { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public ICollection<Product> Products { get; set; }
 }

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using CatalogAPI.Context;
+using CatalogAPI.DTOs.Mappings;
 using CatalogAPI.Extensions;
 using CatalogAPI.Filters;
 using CatalogAPI.Logging;
