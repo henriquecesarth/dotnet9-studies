@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
 using CatalogAPI.Context;
-using CatalogAPI.DTOs.Mappings;
 using CatalogAPI.Extensions;
 using CatalogAPI.Filters;
 using CatalogAPI.Logging;
 using CatalogAPI.Repositories;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -16,7 +16,8 @@ builder
     .Services.AddControllers(options => options.Filters.Add<ApiExceptionFilter>())
     .AddJsonOptions(options =>
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
-    );
+    )
+    .AddNewtonsoftJson();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -39,6 +40,8 @@ builder.Logging.AddProvider(
         new CustomLoggerProviderConfiguration { LogLevel = LogLevel.Information }
     )
 );
+
+builder.Services.AddMapster();
 
 var app = builder.Build();
 

@@ -5,13 +5,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.6.9" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8"/>
+    <PackageReference Include="Scalar.AspNetCore" Version="2.6.9"/>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8"/>
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="9.0.8"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.8"/>
+    <PackageReference Include="Mapster" Version="7.4.0"/>
+    <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1"/>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Logs/" />
+    <Folder Include="Logs/"/>
   </ItemGroup>
 </Project>

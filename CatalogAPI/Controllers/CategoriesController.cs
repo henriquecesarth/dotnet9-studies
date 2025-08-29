@@ -3,6 +3,8 @@ using CatalogAPI.DTOs.Mappings;
 using CatalogAPI.Filters;
 using CatalogAPI.Models;
 using CatalogAPI.Repositories;
+using MapsterMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CatalogAPI.Controllers
@@ -13,11 +15,17 @@ namespace CatalogAPI.Controllers
     {
         private readonly IUnitOfWork _uof;
         private readonly ILogger _logger;
+        private readonly IMapper _mapper;
 
-        public CategoriesController(ILogger<CategoriesController> logger, IUnitOfWork uof)
+        public CategoriesController(
+            ILogger<CategoriesController> logger,
+            IUnitOfWork uof,
+            IMapper mapper
+        )
         {
             _logger = logger;
             _uof = uof;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -34,7 +42,7 @@ namespace CatalogAPI.Controllers
                 return NotFound("Any category was found...");
             }
 
-            var categoriesDTO = categories.MapToCategoryDTOList();
+            var categoriesDTO = _mapper.Map<List<CategoryDTO>>(categories);
 
             return Ok(categoriesDTO);
         }
@@ -52,7 +60,7 @@ namespace CatalogAPI.Controllers
                 return NotFound($"Category with id={id} not found...");
             }
 
-            var categoryDTO = category.MapToCategoryDTO();
+            var categoryDTO = _mapper.Map<CategoryDTO>(category);
 
             return categoryDTO;
         }
@@ -67,7 +75,7 @@ namespace CatalogAPI.Controllers
             if (categories == null)
                 return NotFound("Any category was found...");
 
-            var categoriesDTO = categories.MapToCategoryDTOList();
+            var categoriesDTO = _mapper.Map<List<CategoryProductsDTO>>(categories);
 
             return Ok(categoriesDTO);
         }
@@ -83,12 +91,12 @@ namespace CatalogAPI.Controllers
                 return BadRequest("The category is invalid...");
             }
 
-            var category = categoryDTO.MapToCategory();
+            var category = _mapper.Map<Category>(categoryDTO);
 
             var createdCategory = _uof.CategoryRepository.Create(category);
             _uof.Commit();
 
-            var createdCategoryDTO = createdCategory.MapToCategoryDTO();
+            var createdCategoryDTO = _mapper.Map<CategoryDTO>(createdCategory);
 
             return new CreatedAtRouteResult(
                 "GetCategory",
@@ -108,14 +116,32 @@ namespace CatalogAPI.Controllers
                 return BadRequest("The categories id does not match...");
             }
 
-            var category = categoryDTO.MapToCategory();
+            var category = _mapper.Map<Category>(categoryDTO);
 
             var updatedCategory = _uof.CategoryRepository.Update(category);
             _uof.Commit();
 
-            var updatedCategoryDTO = updatedCategory.MapToCategoryDTO();
+            var updatedCategoryDTO = _mapper.Map<CategoryDTO>(updatedCategory);
 
             return updatedCategoryDTO;
+        }
+
+        [HttpPatch("{id:int}")]
+        public ActionResult<CategoryDTO> Patch(int id, JsonPatchDocument<CategoryDTO> patchDoc)
+        {
+            if (patchDoc == null)
+                return BadRequest("The category is invalid...");
+
+            var category = _uof.CategoryRepository.Get(c => c.CategoryId == id);
+
+            if (category == null)
+                return NotFound($"Category with id={id} not found...");
+
+            var categoryToPatch = _mapper.Map<CategoryDTO>(category);
+
+            patchDoc.ApplyTo(categoryToPatch);
+
+            return categoryToPatch;
         }
 
         [HttpDelete("{id:int}")]
@@ -124,7 +150,7 @@ namespace CatalogAPI.Controllers
             var deletedCategory = _uof.CategoryRepository.Delete(id);
             _uof.Commit();
 
-            var deletedCategoryDTO = deletedCategory.MapToCategoryDTO();
+            var deletedCategoryDTO = _mapper.Map<CategoryDTO>(deletedCategory);
 
             return deletedCategoryDTO;
         }

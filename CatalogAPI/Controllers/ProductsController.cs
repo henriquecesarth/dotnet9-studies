@@ -2,6 +2,7 @@ using CatalogAPI.DTOs;
 using CatalogAPI.DTOs.Mappings;
 using CatalogAPI.Models;
 using CatalogAPI.Repositories;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,10 +13,12 @@ namespace CatalogAPI.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IUnitOfWork _uof;
+        private readonly IMapper _mapper;
 
-        public ProductsController(IUnitOfWork uof)
+        public ProductsController(IUnitOfWork uof, IMapper mapper)
         {
             _uof = uof;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -26,7 +29,7 @@ namespace CatalogAPI.Controllers
             if (products == null)
                 return NotFound("Any product was found...");
 
-            var productsDTO = products.MapToProductDTOList();
+            var productsDTO = _mapper.Map<List<ProductDTO>>(products);
 
             return Ok(productsDTO);
         }
@@ -39,7 +42,7 @@ namespace CatalogAPI.Controllers
             if (product == null)
                 return NotFound($"Product with id={id} not found...");
 
-            var productDTO = product.MapToProductDTO();
+            var productDTO = _mapper.Map<ProductDTO>(product);
 
             return productDTO;
         }
@@ -52,7 +55,7 @@ namespace CatalogAPI.Controllers
             if (products == null || !products.Any())
                 return NotFound($"Any product was found for category with id={categoryId}...");
 
-            var productsDTO = products.MapToProductDTOList();
+            var productsDTO = _mapper.Map<List<ProductDTO>>(products);
 
             return Ok(productsDTO);
         }
@@ -60,12 +63,12 @@ namespace CatalogAPI.Controllers
         [HttpPost]
         public ActionResult<ProductDTO> Post(ProductDTO productDTO)
         {
-            var product = productDTO.MapToProduct();
+            var product = _mapper.Map<Product>(productDTO);
 
             var createdProduct = _uof.ProductRepository.Create(product);
             _uof.Commit();
 
-            var createdProductDTO = createdProduct.MapToProductDTO();
+            var createdProductDTO = _mapper.Map<ProductDTO>(createdProduct);
 
             return new CreatedAtRouteResult(
                 "GetProduct",
@@ -80,11 +83,11 @@ namespace CatalogAPI.Controllers
             if (id != productDTO.ProductId)
                 return BadRequest($"Id={id} does not match ProductId={productDTO.ProductId}...");
 
-            var product = productDTO.MapToProduct();
+            var product = _mapper.Map<Product>(productDTO);
             var updatedProduct = _uof.ProductRepository.Update(product);
             _uof.Commit();
 
-            var updatedProductDTO = updatedProduct.MapToProductDTO();
+            var updatedProductDTO = _mapper.Map<ProductDTO>(updatedProduct);
 
             return updatedProductDTO;
         }
@@ -95,7 +98,7 @@ namespace CatalogAPI.Controllers
             var deletedProduct = _uof.ProductRepository.Delete(id);
             _uof.Commit();
 
-            var deletedProductDTO = deletedProduct.MapToProductDTO();
+            var deletedProductDTO = _mapper.Map<ProductDTO>(deletedProduct);
 
             return deletedProductDTO;
         }

@@ -11,8 +11,7 @@ public static class CategoryDTOMappingExtensions
         {
             CategoryId = category.CategoryId,
             Name = category.Name,
-            ImgUrl = category.ImgUrl,
-            Products = category.Products,
+            ImgUrl = category.ImgUrl
         };
     }
 
